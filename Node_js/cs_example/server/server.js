@@ -1,4 +1,4 @@
-const { app, initializeStorage } = require('./app');
+const { app, initializeStorage, debugLog } = require('./app');
 
 const PORT = process.env.PORT || 3000;
 

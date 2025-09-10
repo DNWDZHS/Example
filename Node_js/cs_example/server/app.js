@@ -83,4 +83,4 @@ app.post('/api/save-text', async(req,res) => {
 });
 
 // 导出app和初始化函数
-module.exports = { app, initializeStorage };
+module.exports = { app, initializeStorage, debugLog };
