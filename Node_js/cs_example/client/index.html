@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>资源管理器</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f5f7fa;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        header {
+            background: linear-gradient(135deg, #6e8efb, #a777e3);
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        h1 {
+            margin-bottom: 10px;
+            font-size: 2.2rem;
+        }
+        .description {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+        .main-content {
+            display: flex;
+            padding: 20px;
+            gap: 20px;
+        }
+        .resources-section {
+            flex: 2;
+        }
+        .text-section {
+            flex: 1;
+            background: #f9f9f9;
+            padding: 20px;
+            border-radius: 8px;
+        }
+        .section-title {
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #6e8efb;
+            color: #444;
+        }
+        .resource-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        .resource-item {
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+        .resource-item:hover {
+            transform: translateY(-5px);
+        }
+        .resource-img {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+        }
+        .resource-audio {
+            width: 100%;
+            padding: 10px;
+        }
+        .resource-file {
+            padding: 15px;
+            text-align: center;
+            background: #eef2ff;
+        }
+        .resource-name {
+            padding: 10px;
+            text-align: center;
+            font-size: 0.9rem;
+            word-break: break-word;
+        }
+        .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            background: #6e8efb;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background 0.3s;
+        }
+        .btn:hover {
+            background: #5a7de0;
+        }
+        .btn-refresh {
+            background: #4caf50;
+            margin-bottom: 15px;
+        }
+        .btn-refresh:hover {
+            background: #3d8b40;
+        }
+        textarea {
+            width: 100%;
+            height: 150px;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            resize: vertical;
+            margin-bottom: 15px;
+            font-family: inherit;
+        }
+        input[type="text"] {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            margin-bottom: 15px;
+        }
+        .message {
+            padding: 10px;
+            margin-top: 15px;
+            border-radius: 5px;
+            text-align: center;
+        }
+        .success {
+            background: #d4edda;
+            color: #155724;
+        }
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        .tab-buttons {
+            display: flex;
+            margin-bottom: 15px;
+        }
+        .tab-btn {
+            flex: 1;
+            padding: 10px;
+            background: #e0e0e0;
+            border: none;
+            cursor: pointer;
+            text-align: center;
+        }
+        .tab-btn.active {
+            background: #6e8efb;
+            color: white;
+        }
+        .resource-content {
+            display: none;
+        }
+        .resource-content.active {
+            display: grid;
+        }
+        @media (max-width: 768px) {
+            .main-content {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>资源管理器</h1>
+            <p class="description">动态加载服务器资源并保存文本内容</p>
+        </header>
+
+        <div class="main-content">
+            <div class="resources-section">
+                <h2 class="section-title">服务器资源</h2>
+                <button class="btn btn-refresh" id="refreshBtn">刷新资源</button>
+                
+                <div class="tab-buttons">
+                    <button class="tab-btn active" data-tab="images">图片</button>
+                    <button class="tab-btn" data-tab="audio">音频</button>
+                    <button class="tab-btn" data-tab="files">文件</button>
+                </div>
+                
+                <div class="resource-content active" id="images-content">
+                    <div class="resource-grid" id="imageGrid">
+                        <!-- 图片资源将通过JS动态加载 -->
+                    </div>
+                </div>
+                
+                <div class="resource-content" id="audio-content">
+                    <div class="resource-grid" id="audioGrid">
+                        <!-- 音频资源将通过JS动态加载 -->
+                    </div>
+                </div>
+                
+                <div class="resource-content" id="files-content">
+                    <div class="resource-grid" id="fileGrid">
+                        <!-- 文件资源将通过JS动态加载 -->
+                    </div>
+                </div>
+            </div>
+            
+            <div class="text-section">
+                <h2 class="section-title">保存文本到服务器</h2>
+                <input type="text" id="filename" placeholder="输入文件名（例如：note.txt）">
+                <textarea id="textContent" placeholder="输入要保存的文本内容..."></textarea>
+                <button class="btn" id="saveBtn">保存文本</button>
+                <div id="message"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const refreshBtn = document.getElementById('refreshBtn');
+            const saveBtn = document.getElementById('saveBtn');
+            const messageDiv = document.getElementById('message');
+            const tabButtons = document.querySelectorAll('.tab-btn');
+            const resourceContents = document.querySelectorAll('.resource-content');
+            
+            // 选项卡切换
+            tabButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const tab = button.dataset.tab;
+                    
+                    // 更新活动按钮
+                    tabButtons.forEach(btn => btn.classList.remove('active'));
+                    button.classList.add('active');
+                    
+                    // 更新活动内容
+                    resourceContents.forEach(content => content.classList.remove('active'));
+                    document.getElementById(`${tab}-content`).classList.add('active');
+                });
+            });
+            
+            // 加载资源函数
+            async function loadResources(type, containerId) {
+                try {
+                    const response = await fetch(`/api/resources/${type}`);
+                    if (!response.ok) throw new Error('网络响应不正常');
+                    
+                    const resources = await response.json();
+                    const container = document.getElementById(containerId);
+                    container.innerHTML = '';
+                    
+                    if (resources.length === 0) {
+                        container.innerHTML = '<p>没有找到资源</p>';
+                        return;
+                    }
+                    
+                    resources.forEach(resource => {
+                        const resourceElement = document.createElement('div');
+                        resourceElement.className = 'resource-item';
+                        
+                        if (type === 'images') {
+                            resourceElement.innerHTML = `
+                                <img src="/resources/images/${resource}" class="resource-img" alt="${resource}">
+                                <div class="resource-name">${resource}</div>
+                            `;
+                        } else if (type === 'audio') {
+                            resourceElement.innerHTML = `
+                                <audio controls class="resource-audio">
+                                    <source src="/resources/audio/${resource}" type="audio/mpeg">
+                                    您的浏览器不支持音频元素。
+                                </audio>
+                                <div class="resource-name">${resource}</div>
+                            `;
+                        } else {
+                            resourceElement.innerHTML = `
+                                <div class="resource-file">
+                                    <p>📄 ${resource}</p>
+                                </div>
+                                <div class="resource-name">${resource}</div>
+                            `;
+                        }
+                        
+                        container.appendChild(resourceElement);
+                    });
+                } catch (error) {
+                    console.error(`加载${type}失败:`, error);
+                    document.getElementById(containerId).innerHTML = `<p>加载资源时出错: ${error.message}</p>`;
+                }
+            }
+            
+            // 刷新所有资源
+            async function refreshAllResources() {
+                await loadResources('images', 'imageGrid');
+                await loadResources('audio', 'audioGrid');
+                await loadResources('files', 'fileGrid');
+            }
+            
+            // 保存文本函数
+            async function saveText() {
+                const filename = document.getElementById('filename').value;
+                const content = document.getElementById('textContent').value;
+                
+                if (!filename || !content) {
+                    showMessage('文件名和内容都不能为空', 'error');
+                    return;
+                }
+                
+                try {
+                    const response = await fetch('/api/save-text', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ filename, content })
+                    });
+                    
+                    const result = await response.json();
+                    
+                    if (response.ok) {
+                        showMessage('文本保存成功！', 'success');
+                        document.getElementById('filename').value = '';
+                        document.getElementById('textContent').value = '';
+                        // 刷新文件列表
+                        loadResources('files', 'fileGrid');
+                    } else {
+                        showMessage(`保存失败: ${result.error}`, 'error');
+                    }
+                } catch (error) {
+                    console.error('保存文本时出错:', error);
+                    showMessage('网络错误，请稍后重试', 'error');
+                }
+            }
+            
+            // 显示消息函数
+            function showMessage(message, type) {
+                messageDiv.textContent = message;
+                messageDiv.className = `message ${type}`;
+                
+                // 3秒后消失
+                setTimeout(() => {
+                    messageDiv.textContent = '';
+                    messageDiv.className = 'message';
+                }, 3000);
+            }
+            
+            // 事件监听
+            refreshBtn.addEventListener('click', refreshAllResources);
+            saveBtn.addEventListener('click', saveText);
+            
+            // 初始加载资源
+            refreshAllResources();
+        });
+    </script>
+</body>
+</html>

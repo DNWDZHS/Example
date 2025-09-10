@@ -1,0 +1,19 @@
+{
+  "name": "cs_example",
+  "version": "1.0.0",
+  "description": "a example for client/server ",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server/server.js",
+    "start:debug": "cross-env DEBUG=true node server/server.js"
+  },
+  "author": "dnwdzhs",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^5.1.0"
+  },
+  "devDependencies": {
+    "cross-env": "^10.0.0"
+  }
+}
